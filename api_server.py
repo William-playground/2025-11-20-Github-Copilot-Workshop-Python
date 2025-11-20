@@ -45,7 +45,7 @@ def save_progress():
         JSON: 保存結果
     """
     try:
-        data = request.get_json()
+        data = request.get_json(force=False, silent=True)
         
         if data is None:
             return jsonify({
