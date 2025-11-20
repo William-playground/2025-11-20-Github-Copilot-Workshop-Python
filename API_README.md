@@ -17,6 +17,13 @@ python3 api_server.py
 
 サーバーは `http://localhost:5000` で起動します。
 
+**デバッグモード（開発環境のみ）:**
+```bash
+FLASK_DEBUG=true python3 api_server.py
+```
+
+**注意:** デバッグモードは開発時のみ使用してください。本番環境では絶対に使用しないでください。
+
 ## APIエンドポイント
 
 ### 1. ヘルスチェック
