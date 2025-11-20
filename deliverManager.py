@@ -1,8 +1,10 @@
 import time
 import random
-from typing import List, Callable, Optional
+from typing import List, Callable, Optional, Dict
 from dataclasses import dataclass, field
 from enum import Enum
+from datetime import datetime, date
+from collections import defaultdict
 
 
 class EventArgs:
@@ -37,6 +39,16 @@ class KitchenObjectSO:
     """キッチンオブジェクトのデータクラス"""
     name: str
     object_id: int
+    
+    def __eq__(self, other):
+        """材料の比較（名前とIDで判定）"""
+        if not isinstance(other, KitchenObjectSO):
+            return False
+        return self.name == other.name and self.object_id == other.object_id
+    
+    def __hash__(self):
+        """ハッシュ値を生成（辞書のキーとして使用可能にする）"""
+        return hash((self.name, self.object_id))
 
 
 @dataclass
@@ -120,6 +132,13 @@ class DeliveryManager:
         self._waiting_recipes_max = 4
         self._successful_recipes_amount = 0
         self._last_update_time = time.time()
+        
+        # 日付ごとの進捗管理
+        self._daily_progress: Dict[str, Dict[str, int]] = defaultdict(lambda: {
+            'successful': 0,
+            'failed': 0,
+            'total': 0
+        })
     
     @classmethod
     def get_instance(cls, recipe_list_so: RecipeListSO = None) -> 'DeliveryManager':
@@ -181,12 +200,20 @@ class DeliveryManager:
                     self._successful_recipes_amount += 1
                     self._waiting_recipe_so_list.pop(i)
                     
+                    # 日付ごとの成功カウントを更新
+                    today = date.today().isoformat()
+                    self._daily_progress[today]['successful'] += 1
+                    self._daily_progress[today]['total'] += 1
+                    
                     # 成功イベント発火
                     self.on_recipe_completed.invoke(self)
                     self.on_recipe_success.invoke(self)
                     return
         
         # 一致するレシピが見つからなかった場合
+        today = date.today().isoformat()
+        self._daily_progress[today]['failed'] += 1
+        self._daily_progress[today]['total'] += 1
         self.on_recipe_failed.invoke(self)
     
     def get_waiting_recipe_so_list(self) -> List[RecipeSO]:
@@ -196,6 +223,36 @@ class DeliveryManager:
     def get_successful_recipes_amount(self) -> int:
         """成功したレシピ数を取得"""
         return self._successful_recipes_amount
+    
+    def get_progress_by_date(self, target_date: str) -> Dict[str, int]:
+        """指定した日付の進捗を取得
+        
+        Args:
+            target_date: 日付文字列 (YYYY-MM-DD形式)
+        
+        Returns:
+            進捗情報の辞書 {'successful': int, 'failed': int, 'total': int}
+        """
+        if target_date in self._daily_progress:
+            return dict(self._daily_progress[target_date])
+        return {'successful': 0, 'failed': 0, 'total': 0}
+    
+    def get_today_progress(self) -> Dict[str, int]:
+        """今日の進捗を取得
+        
+        Returns:
+            今日の進捗情報の辞書 {'successful': int, 'failed': int, 'total': int}
+        """
+        today = date.today().isoformat()
+        return self.get_progress_by_date(today)
+    
+    def get_all_daily_progress(self) -> Dict[str, Dict[str, int]]:
+        """全ての日付の進捗を取得
+        
+        Returns:
+            日付をキーとした進捗情報の辞書
+        """
+        return {date_str: dict(progress) for date_str, progress in self._daily_progress.items()}
 
 
 # 使用例
@@ -252,3 +309,23 @@ if __name__ == "__main__":
     delivery_manager.deliver_recipe(plate)
     
     print(f"成功したレシピ数: {delivery_manager.get_successful_recipes_amount()}")
+    
+    # 日付ベースの進捗確認
+    print("\n--- 日付ベースの進捗 ---")
+    today_progress = delivery_manager.get_today_progress()
+    print(f"今日の進捗: {today_progress}")
+    print(f"  成功: {today_progress['successful']}")
+    print(f"  失敗: {today_progress['failed']}")
+    print(f"  合計: {today_progress['total']}")
+    
+    # 失敗のテスト
+    wrong_plate = PlateKitchenObject()
+    wrong_plate.add_kitchen_object(bread)
+    print("\n間違った配達をテスト...")
+    delivery_manager.deliver_recipe(wrong_plate)
+    
+    today_progress = delivery_manager.get_today_progress()
+    print(f"更新後の今日の進捗: {today_progress}")
+    print(f"  成功: {today_progress['successful']}")
+    print(f"  失敗: {today_progress['failed']}")
+    print(f"  合計: {today_progress['total']}")
