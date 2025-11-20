@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポモドーロタイマー</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1 class="title">ポモドーロタイマー</h1>
+                <div class="window-controls">
+                    <button class="control-btn minimize">−</button>
+                    <button class="control-btn maximize">□</button>
+                    <button class="control-btn close">×</button>
+                </div>
+            </div>
+            
+            <div class="status-text" id="statusText">作業中</div>
+            
+            <div class="timer-container">
+                <svg class="progress-ring" width="280" height="280">
+                    <circle
+                        class="progress-ring-circle-bg"
+                        cx="140"
+                        cy="140"
+                        r="120"
+                    />
+                    <circle
+                        class="progress-ring-circle"
+                        cx="140"
+                        cy="140"
+                        r="120"
+                        id="progressCircle"
+                    />
+                </svg>
+                <div class="timer-display" id="timerDisplay">25:00</div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="startBtn">開始</button>
+                <button class="btn btn-secondary" id="resetBtn">リセット</button>
+            </div>
+            
+            <div class="progress-section">
+                <h2 class="progress-title">今日の進捗</h2>
+                <div class="progress-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="completedCount">0</div>
+                        <div class="stat-label">完了</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="totalTime">0時間0分</div>
+                        <div class="stat-label">集中時間</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
