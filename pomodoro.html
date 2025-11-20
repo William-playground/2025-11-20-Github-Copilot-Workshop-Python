@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <link rel="stylesheet" href="pomodoro.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pomodoro Timer</h1>
+        
+        <div class="timer-container">
+            <svg class="progress-ring" width="300" height="300">
+                <circle class="progress-ring-circle-bg" 
+                    stroke="#e0e0e0" 
+                    stroke-width="10" 
+                    fill="transparent" 
+                    r="140" 
+                    cx="150" 
+                    cy="150"/>
+                <circle class="progress-ring-circle" 
+                    stroke="#4CAF50" 
+                    stroke-width="10" 
+                    fill="transparent" 
+                    r="140" 
+                    cx="150" 
+                    cy="150"/>
+            </svg>
+            
+            <div class="timer-display">
+                <div class="time" id="timeDisplay">25:00</div>
+                <div class="status" id="statusDisplay">準備完了</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">開始</button>
+            <button id="pauseBtn" class="btn btn-secondary" disabled>一時停止</button>
+            <button id="resetBtn" class="btn btn-tertiary">リセット</button>
+        </div>
+        
+        <div class="settings">
+            <div class="setting-item">
+                <label for="workDuration">作業時間 (分):</label>
+                <input type="number" id="workDuration" min="1" max="60" value="25">
+            </div>
+            <div class="setting-item">
+                <label for="breakDuration">休憩時間 (分):</label>
+                <input type="number" id="breakDuration" min="1" max="30" value="5">
+            </div>
+        </div>
+    </div>
+    
+    <script src="pomodoro.js"></script>
+</body>
+</html>
