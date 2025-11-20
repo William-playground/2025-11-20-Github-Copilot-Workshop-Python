@@ -1,6 +1,9 @@
 """
 シンプルなFlask APIバックエンド
 日付ごとの進捗を取得・表示する
+
+このモジュールは、配達管理システムのWeb APIを提供します。
+日付ベースの進捗追跡機能を持ち、今日の進捗や過去の進捗を取得できます。
 """
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
@@ -126,4 +129,7 @@ def deliver_recipe():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # デバッグモードは開発時のみ使用。本番環境では必ず False に設定すること
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
